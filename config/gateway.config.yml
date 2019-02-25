@@ -1,0 +1,69 @@
+http:
+  port: 8080
+admin:
+  port: 9876
+  hostname: localhost
+apiEndpoints:
+  auth:
+    host: localhost
+    paths:
+      - '/api/v3/authentication/login'
+      - '/api/v3/authentication/register'
+  user:
+    host: localhost
+    paths:
+      - '/api/v3/users/profile'
+      - '/api/v3/users/profile/*'
+      - '/api/v3/users/address'
+      - '/api/v3/users/address/*'
+      - '/api/v3/users/sub_district'
+      - '/api/v3/users/sub_district/*'
+      - '/api/v3/users/district'
+      - '/api/v3/users/district/*'
+      - '/api/v3/users/city'
+      - '/api/v3/users/city/*'
+      - '/api/v3/users/country'
+      - '/api/v3/users/country/*'
+      - '/api/v3/users/region'
+      - '/api/v3/users/region/*'
+      - '/api/v3/users/user_cc'
+      - '/api/v3/users/user_cc/*'
+      - '/api/v3/users/referral_code'
+      - '/api/v3/users/referral_code/*'
+serviceEndpoints:
+  authService:
+    url: 'http://localhost:8000'
+  userService:
+    url: 'http://localhost:8000'
+policies:
+  - basic-auth
+  - cors
+  - expression
+  - key-auth
+  - log
+  - oauth2
+  - proxy
+  - rate-limit
+pipelines:
+  - name: auth-service
+    apiEndpoints:
+      - auth
+    policies:
+      - cors:
+        - action:
+            origin: '*'
+      - proxy:
+        - action:
+            serviceEndpoint: authService
+            changeOrigin: true
+  - name: user-service
+    apiEndpoints:
+      - user
+    policies:
+      - cors:
+        - action:
+            origin: '*'
+      - proxy:
+        - action:
+            serviceEndpoint: userService
+            changeOrigin: true
